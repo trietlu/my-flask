@@ -4,17 +4,24 @@ phases:
   install:
     runtime-versions:
       python: 3.8
+      docker: 18
   pre_build:
     commands:
       # Discover and run unit tests. For more information, see <https://docs.pytest.org/en/latest/goodpractices.html>
       - python setup.py pytest
-      - pip install python-taint
-      - python -m pyt helloworld/application.py
+      - pip install python-taint && python -m pyt helloworld/application.py
+      - $(aws ecr get-login --no-include-email --region us-east-2)
 
       # Do not remove this statement. This command is required for AWS CodeStar projects.
       # Update the AWS Partition, AWS Region, account ID and project ID in the project ARN in template-configuration.json file so AWS CloudFormation can tag project resources.
       - sed -i.bak 's/\$PARTITION\$/'${PARTITION}'/g;s/\$AWS_REGION\$/'${AWS_REGION}'/g;s/\$ACCOUNT_ID\$/'${ACCOUNT_ID}'/g;s/\$PROJECT_ID\$/'${PROJECT_ID}'/g' template-configuration.json
-
+  build:
+    commands:
+      - docker build -t my-flask:latest .
+      - docker tag my-flask:latest 251647719696.dkr.ecr.us-east-2.amazonaws.com/my-flask:latest
+  post_build:
+    commands:
+      - docker push 251647719696.dkr.ecr.us-east-2.amazonaws.com/my-flask:latest
 artifacts:
   files:
     - 'template.yml'
