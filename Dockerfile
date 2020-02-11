@@ -4,4 +4,4 @@ copy helloworld/ /
 ENV PORT 8080
 EXPOSE 8080
 ENTRYPOINT ["python"]
-CMD ["/usr/src/app/flask_app.py"]
+CMD ["/usr/src/app/flaskrun.py"]
